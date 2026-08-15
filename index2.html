@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>تقديم معاملة الإقامة والتأمين في تركيا - حجز موعد الإقامات</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --accent: #10b981;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            padding-bottom: 90px;
+        }
+
+        #toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 380px;
+            width: 100%;
+            pointer-events: none;
+        }
+
+        .custom-toast {
+            pointer-events: auto;
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            padding: 14px 18px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: toastIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .custom-toast.success { border-left: 4px solid #10b981; }
+        .custom-toast.error { border-left: 4px solid #ef4444; }
+        .custom-toast.warning { border-left: 4px solid #f59e0b; }
+
+        .toast-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .custom-toast.success .toast-icon { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+        .custom-toast.error .toast-icon { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .custom-toast.warning .toast-icon { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+
+        .toast-content { flex: 1; }
+        .toast-title { font-size: 0.9rem; font-weight: 600; color: #fff; margin-bottom: 2px; }
+        .toast-message { font-size: 0.8rem; color: #94a3b8; line-height: 1.3; }
+
+        @keyframes toastIn {
+            0% { transform: translateX(100px); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+
+        .custom-toast.fade-out { animation: toastOut 0.3s ease forwards; }
+        @keyframes toastOut {
+            0% { transform: translateX(0); opacity: 1; }
+            100% { transform: translateX(100px); opacity: 0; }
+        }
+
+        .mobile-card {
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 25px 20px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            margin-top: 20px;
+        }
+        .header { text-align: center; margin-bottom: 20px; }
+        .header i { font-size: 2.3rem; color: #38bdf8; margin-bottom: 8px; }
+        .header h1 { font-size: 1.4rem; font-weight: 700; }
+        .header p { color: var(--text-muted); font-size: 0.85rem; margin-top: 4px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: flex; align-items: center; gap: 8px; font-size: 0.88rem; font-weight: 600; margin-bottom: 6px; color: #e2e8f0; }
+        .form-group label i { color: #38bdf8; }
+        .custom-input, .custom-select {
+            width: 100%;
+            padding: 12px 14px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1.5px solid var(--border-color);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        .custom-input:focus, .custom-select:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(37, 99, 235, 0.4); }
+        .custom-select option { background-color: #0f172a; color: #fff; }
+        .insurance-fields, .spouse-fields { display: none; margin-top: 10px; }
+        .price-summary-box {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px dashed var(--accent);
+            border-radius: 14px;
+            padding: 12px 15px;
+            margin: 15px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .price-summary-box .amount { font-size: 1.3rem; font-weight: 800; color: var(--accent); }
+        .upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+        .file-box {
+            position: relative;
+            background: rgba(15, 23, 42, 0.4);
+            border: 2px dashed var(--border-color);
+            border-radius: 14px;
+            padding: 12px 8px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .file-box.uploaded { border-color: var(--accent); background: rgba(16, 185, 129, 0.1); }
+        .file-box input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+        .file-box i { font-size: 1.3rem; color: #38bdf8; margin-bottom: 4px; }
+        .file-box span { display: block; font-size: 0.75rem; color: var(--text-muted); }
+        .btn-submit {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4);
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .ai-fab {
+            position: fixed; bottom: 20px; left: 20px;
+            width: 60px; height: 60px; border-radius: 50%;
+            background: linear-gradient(135deg, #38bdf8, #2563eb);
+            box-shadow: 0 8px 20px rgba(56, 189, 248, 0.4);
+            display: flex; justify-content: center; align-items: center;
+            color: #fff; font-size: 1.5rem; cursor: pointer; z-index: 99;
+        }
+        .ai-chat-box {
+            display: none; position: fixed; bottom: 90px; left: 20px;
+            width: 380px; background: var(--card-bg);
+            border: 1px solid var(--border-color); border-radius: 18px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6); z-index: 100;
+            flex-direction: column; overflow: hidden; max-height: 560px;
+        }
+        .ai-chat-header {
+            background: var(--primary); padding: 12px 15px;
+            display: flex; justify-content: space-between; align-items: center; color: #fff;
+        }
+        .chat-body-section { padding: 15px; overflow-y: auto; max-height: 500px; }
+        .chat-intro-text { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; }
+        .chat-form-group { margin-bottom: 12px; }
+        .chat-form-group input, .chat-form-group select {
+            width: 100%; padding: 10px 12px; background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-color); border-radius: 8px; color: #fff; font-size: 0.85rem; outline: none;
+        }
+        .active-chat-container, .admin-step-2, .admin-panel-section { display: none; flex-direction: column; }
+        .ai-chat-messages {
+            flex: 1; padding: 12px; overflow-y: auto; font-size: 0.85rem;
+            height: 250px; display: flex; flex-direction: column; gap: 10px; background: #0f172a;
+        }
+        .msg { padding: 8px 12px; border-radius: 12px; max-width: 85%; line-height: 1.4; position: relative; }
+        .msg.bot { background: rgba(56, 189, 248, 0.15); color: #f8fafc; align-self: flex-start; }
+        .msg.user { background: var(--primary); color: #fff; align-self: flex-end; }
+        .ai-chat-input {
+            display: flex; padding: 10px; background: var(--card-bg); gap: 6px;
+            border-top: 1px solid var(--border-color);
+        }
+        .ai-chat-input input {
+            flex: 1; background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 8px 10px; color: #fff; font-size: 0.85rem; outline: none;
+        }
+        .ai-chat-input button { background: var(--primary); border: none; color: white; padding: 8px 14px; border-radius: 8px; cursor: pointer; }
+
+        @media (max-width: 480px) {
+            .mobile-card { margin-top: 20px; }
+            #toast-container { right: 10px; left: 10px; max-width: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="toast-container"></div>
+
+    <!-- الواجهة الرئيسية والاستمارة -->
+    <div class="mobile-card" id="main-content-card">
+        <header class="header">
+            <i class="fa-solid fa-passport"></i>
+            <h1>تقديم معاملة الإقامة والتأمين</h1>
+            <p>رسوم موعد التقديم ثابتة: <span id="header-fee-display">200</span> TL</p>
+        </header>
+
+        <form id="residence-form" action="/submit" method="POST" enctype="multipart/form-data" onsubmit="return validateMainForm(event)">
+            <div class="form-group">
+                <label><i class="fa-solid fa-phone"></i> رقم الموبايل (واتساب التركي)</label>
+                <div style="display: flex; align-items: center; background: rgba(15, 23, 42, 0.6); border: 1.5px solid var(--border-color); border-radius: 12px; padding-right: 10px;">
+                    <span style="color: #38bdf8; font-weight: bold; padding: 0 10px; border-left: 1px solid var(--border-color);">+90</span>
+                    <input type="tel" id="main-phone" name="phone-number" class="custom-input" placeholder="5XX XXX XX XX" maxlength="10" required style="border: none; background: transparent;">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fa-solid fa-layer-group"></i> نوع الإقامة المطلوبة</label>
+                <select name="residence-type" id="select-residence-type" class="custom-select" required>
+                    <option value="" disabled selected>اختر نوع الإقامة...</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fa-solid fa-ring"></i> الحالة الاجتماعية</label>
+                <select name="marital-status" id="select-marital-status" class="custom-select" onchange="toggleSpouseFields()" required>
+                    <option value="" disabled selected>اختر الحالة...</option>
+                </select>
+                
+                <!-- خيار جنسية الزوج أو الزوجة (يظهر فقط عند اختيار متزوج / متزوجه) -->
+                <div class="spouse-fields" id="spouse-fields-container">
+                    <label style="font-size: 0.8rem; margin-top: 8px; color: #38bdf8;"><i class="fa-solid fa-heart"></i> هل زوجك / زوجتك تركي أم أجنبي؟</label>
+                    <select name="spouse-nationality" id="spouse-nationality" class="custom-select">
+                        <option value="" disabled selected>اختر الجنسية...</option>
+                        <option value="turkish">تركي / تركية 🇹🇷</option>
+                        <option value="foreign">أجنبي / أجنبية 🌍</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fa-solid fa-calendar-check"></i> مدة الإقامة</label>
+                <select name="residence-duration" id="select-residence-duration" class="custom-select" required>
+                    <option value="" disabled selected>اختر المدة...</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fa-solid fa-shield-halved"></i> هل تريد تأمين صحي؟</label>
+                <select id="insurance-option" name="insurance-option" class="custom-select" onchange="toggleInsuranceFields()" required>
+                    <option value="" disabled selected>اختر الخيار...</option>
+                </select>
+            </div>
+
+            <div class="insurance-fields" id="insurance-fields">
+                <div class="form-group">
+                    <label>مدة التأمين الصحي</label>
+                    <select id="insurance-duration" name="insurance-duration" class="custom-select" onchange="calculateTotalPrice()">
+                        <option value="1" selected>سنة واحدة</option>
+                        <option value="2">سنتين</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>تاريخ الميلاد</label>
+                    <input type="date" id="birth-date" name="birth-date" class="custom-input" onchange="calculateTotalPrice()">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fa-solid fa-camera"></i> رفع المستندات المطلوبة</label>
+                <div class="upload-grid" id="upload-grid-container"></div>
+            </div>
+
+            <div class="price-summary-box">
+                <div>المبلغ الإجمالي المتوقع:</div>
+                <div class="amount" id="total-price-display">200 TL</div>
+            </div>
+
+            <button type="submit" class="btn-submit">ارسل المعلومات <i class="fa-solid fa-paper-plane"></i></button>
+        </form>
+    </div>
+
+    <!-- زر المحادثة ولوحة التحكم الذكية -->
+    <div class="ai-fab" id="chat-fab-btn" onclick="toggleChat()"><i class="fa-solid fa-comments"></i></div>
+    <div class="ai-chat-box" id="ai-chat-box">
+        <div class="ai-chat-header">
+            <h4><i class="fa-solid fa-headset"></i> الدعم الفني </h4>
+            <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="toggleChat()"></i>
+        </div>
+        
+        <div class="chat-body-section" id="chat-details-section">
+            <p class="chat-intro-text">يرجى إدخال بريد إلكتروني حقيقي ونظامي لبدء المحادثة .</p>
+            <div class="chat-form-group"><input type="text" id="chat-user-name" placeholder="الاسم *" required></div>
+            <div class="chat-form-group"><input type="email" id="chat-user-email" placeholder="البريد الإلكتروني (Gmail) *" required></div>
+            
+            <div class="chat-form-group">
+                <div style="display: flex; align-items: center; background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-color); border-radius: 8px; padding-right: 10px;">
+                    <span style="color: #38bdf8; font-weight: bold; padding: 0 10px; border-left: 1px solid var(--border-color); font-size: 0.85rem;">+90</span>
+                    <input type="tel" id="chat-user-phone" placeholder="5XX XXX XX XX" maxlength="10" style="border: none; background: transparent; width: 100%; padding: 10px 8px; color: #fff; font-size: 0.85rem; outline: none;">
+                </div>
+            </div>
+
+            <button class="btn-submit" onclick="startChatOrAdminRequest()"> بدء المحادثة</button>
+        </div>
+
+        <div class="chat-body-section admin-step-2" id="admin-step-2">
+            <p class="chat-intro-text" style="color: #38bdf8;">تم إرسال رمز التحقق (OTP) المكون من 6 أرقام إلى بريدك الإلكتروني.</p>
+            <div class="chat-form-group">
+                <input type="text" id="otp-code-input" placeholder="أدخل كود التحقق..." maxlength="6" style="text-align: center; letter-spacing: 4px; font-size: 1.1rem;">
+            </div>
+            <button class="btn-submit" onclick="verifyAdminOtp()">تأكيد الكود والدخول</button>
+        </div>
+
+        <div class="chat-body-section admin-panel-section" id="admin-panel-section">
+            <p class="chat-intro-text" style="color: #10b981;">أهلاً بك يا سعد، لوحة التحكم المدمجة:</p>
+            
+            <form id="config-update-form" onsubmit="saveConfigFromChat(event)">
+                <h5 style="color: #38bdf8; font-size: 0.9rem; margin-bottom: 8px;">إدارة الخيارات (إضافة / تعديل):</h5>
+                
+                <div class="chat-form-group">
+                    <label style="font-size: 0.8rem; color:#cbd5e1;">نوع الإقامة المطلوبة</label>
+                    <div id="admin-residence-types-box" style="display:flex; flex-direction:column; gap:6px; margin-bottom:8px;"></div>
+                    <div style="display:flex; gap:5px;">
+                        <input type="text" id="new-res-key" placeholder="المفتاح" style="flex:1;">
+                        <input type="text" id="new-res-val" placeholder="التسمية" style="flex:1.5;">
+                        <button type="button" onclick="addCustomOption('residence_types')" style="background:var(--accent); border:none; color:#fff; padding:6px 10px; border-radius:6px; cursor:pointer;">إضافة</button>
+                    </div>
+                </div>
+
+                <div class="chat-form-group">
+                    <label style="font-size: 0.8rem; color:#cbd5e1;">الحالة الاجتماعية</label>
+                    <div id="admin-marital-statuses-box" style="display:flex; flex-direction:column; gap:6px; margin-bottom:8px;"></div>
+                    <div style="display:flex; gap:5px;">
+                        <input type="text" id="new-mar-key" placeholder="المفتاح" style="flex:1;">
+                        <input type="text" id="new-mar-val" placeholder="التسمية" style="flex:1.5;">
+                        <button type="button" onclick="addCustomOption('marital_statuses')" style="background:var(--accent); border:none; color:#fff; padding:6px 10px; border-radius:6px; cursor:pointer;">إضافة</button>
+                    </div>
+                </div>
+
+                <div class="chat-form-group">
+                    <label style="font-size: 0.8rem; color:#cbd5e1;">مدة الإقامة</label>
+                    <div id="admin-residence-durations-box" style="display:flex; flex-direction:column; gap:6px; margin-bottom:8px;"></div>
+                    <div style="display:flex; gap:5px;">
+                        <input type="text" id="new-dur-key" placeholder="المفتاح" style="flex:1;">
+                        <input type="text" id="new-dur-val" placeholder="التسمية" style="flex:1.5;">
+                        <button type="button" onclick="addCustomOption('residence_durations')" style="background:var(--accent); border:none; color:#fff; padding:6px 10px; border-radius:6px; cursor:pointer;">إضافة</button>
+                    </div>
+                </div>
+
+                <div class="chat-form-group">
+                    <label style="font-size: 0.8rem; color:#cbd5e1;">هل تريد تأمين صحي؟ (الخيارات)</label>
+                    <div id="admin-insurance-options-box" style="display:flex; flex-direction:column; gap:6px; margin-bottom:8px;"></div>
+                    <div style="display:flex; gap:5px;">
+                        <input type="text" id="new-ins-key" placeholder="المفتاح" style="flex:1;">
+                        <input type="text" id="new-ins-val" placeholder="التسمية" style="flex:1.5;">
+                        <button type="button" onclick="addCustomOption('insurance_options')" style="background:var(--accent); border:none; color:#fff; padding:6px 10px; border-radius:6px; cursor:pointer;">إضافة</button>
+                    </div>
+                </div>
+
+                <div class="chat-form-group">
+                    <label style="font-size: 0.8rem; color:#cbd5e1;">رفع المستندات المطلوبة</label>
+                    <div id="admin-document-labels-box" style="display:flex; flex-direction:column; gap:6px; margin-bottom:8px;"></div>
+                    <div style="display:flex; gap:5px;">
+                        <input type="text" id="new-doc-key" placeholder="المفتاح" style="flex:1;">
+                        <input type="text" id="new-doc-val" placeholder="التسمية" style="flex:1.5;">
+                        <button type="button" onclick="addCustomOption('document_labels')" style="background:var(--accent); border:none; color:#fff; padding:6px 10px; border-radius:6px; cursor:pointer;">إضافة</button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit" style="margin-top: 10px;">حفظ وتحديث الخيارات المطلوبة فوراً</button>
+            </form>
+
+            <form id="price-update-form" onsubmit="savePricesFromChat(event)" style="margin-top: 25px; border-top: 1px solid var(--border-color); padding-top: 15px;">
+                <div class="chat-form-group">
+                    <label style="font-size: 0.8rem; color:#cbd5e1;">رسوم الموعد الثابتة (TL)</label>
+                    <input type="number" id="admin-residence-fee" required>
+                </div>
+                <h5 style="margin: 10px 0; color: #38bdf8; font-size: 0.85rem;">أسعار التأمين حسب الفئات:</h5>
+                <div class="chat-form-group"><label style="font-size:0.75rem;">(0-16 سنة)</label><input type="number" id="rate_0_16" required></div>
+                <div class="chat-form-group"><label style="font-size:0.75rem;">(17-25 سنة)</label><input type="number" id="rate_17_25" required></div>
+                <div class="chat-form-group"><label style="font-size:0.75rem;">(26-35 سنة)</label><input type="number" id="rate_26_35" required></div>
+                <div class="chat-form-group"><label style="font-size:0.75rem;">(36-45 سنة)</label><input type="number" id="rate_36_45" required></div>
+                <div class="chat-form-group"><label style="font-size:0.75rem;">(46-55 سنة)</label><input type="number" id="rate_46_55" required></div>
+                <div class="chat-form-group"><label style="font-size:0.75rem;">(56-60 سنة)</label><input type="number" id="rate_56_60" required></div>
+                <div class="chat-form-group"><label style="font-size:0.75rem;">(61-64 سنة)</label><input type="number" id="rate_61_64" required></div>
+                <div class="chat-form-group"><label style="font-size:0.75rem;">(65-69 سنة)</label><input type="number" id="rate_65_69" required></div>
+                <button type="submit" class="btn-submit" style="margin-top: 10px;">حفظ وتحديث الأسعار فوراً</button>
+            </form>
+
+            <div style="margin-top: 25px; border-top: 1px solid var(--border-color); padding-top: 15px;">
+                <h5 style="color: #38bdf8; font-size: 0.9rem; margin-bottom: 10px;"><i class="fa-solid fa-envelope-open-text"></i> رسائل العملاء الواردة:</h5>
+                <div id="admin-messages-container" style="display: flex; flex-direction: column; gap: 10px; max-height: 350px; overflow-y: auto;"></div>
+            </div>
+        </div>
+
+        <div class="active-chat-container" id="active-chat-container">
+            <div class="ai-chat-messages" id="chat-messages">
+                <div class="msg bot">مرحباً بك! تم فتح قناة الاتصال. أي رسالة تكتبها هنا ستصل مباشرة إلى فريق الدعم عبر البريد الإلكتروني.</div>
+            </div>
+            <div class="ai-chat-input">
+                <input type="text" id="user-input" placeholder="اكتب رسالتك..." onkeypress="if(event.key === 'Enter') sendUserMessage()">
+                <button onclick="sendUserMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let chatUserData = { name: '', email: '', phone: '' };
+        let currentPrices = { residence_fee: 200, insurance_rates: {} };
+        let siteConfig = {};
+        let clientPollingInterval = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            fetchLivePrices();
+            fetchSiteConfig();
+        });
+
+        function showToast(title, message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `custom-toast ${type}`;
+            
+            let iconClass = 'fa-solid fa-check';
+            if(type === 'error') iconClass = 'fa-solid fa-xmark';
+            if(type === 'warning') iconClass = 'fa-solid fa-triangle-exclamation';
+
+            toast.innerHTML = `
+                <div class="toast-icon"><i class="${iconClass}"></i></div>
+                <div class="toast-content">
+                    <div class="toast-title">${title}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('fade-out');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        async function fetchLivePrices() {
+            try {
+                const res = await fetch('/api/prices');
+                const data = await res.json();
+                currentPrices = data;
+                document.getElementById('header-fee-display').innerText = data.residence_fee;
+                calculateTotalPrice();
+            } catch (e) { console.log(e); }
+        }
+
+        async function fetchSiteConfig() {
+            try {
+                const res = await fetch('/api/config');
+                siteConfig = await res.json();
+                renderMainFormOptions();
+            } catch (e) { console.log(e); }
+        }
+
+        function renderMainFormOptions() {
+            const resSelect = document.getElementById('select-residence-type');
+            resSelect.innerHTML = '<option value="" disabled selected>اختر نوع الإقامة...</option>';
+            if(siteConfig.residence_types) {
+                for (const [key, val] of Object.entries(siteConfig.residence_types)) {
+                    resSelect.innerHTML += `<option value="${key}">${val}</option>`;
+                }
+            }
+
+            const marSelect = document.getElementById('select-marital-status');
+            marSelect.innerHTML = '<option value="" disabled selected>اختر الحالة...</option>';
+            if(siteConfig.marital_statuses) {
+                for (const [key, val] of Object.entries(siteConfig.marital_statuses)) {
+                    marSelect.innerHTML += `<option value="${key}">${val}</option>`;
+                }
+            }
+
+            const durSelect = document.getElementById('select-residence-duration');
+            durSelect.innerHTML = '<option value="" disabled selected>اختر المدة...</option>';
+            if(siteConfig.residence_durations) {
+                for (const [key, val] of Object.entries(siteConfig.residence_durations)) {
+                    durSelect.innerHTML += `<option value="${key}">${val}</option>`;
+                }
+            }
+
+            const insSelect = document.getElementById('insurance-option');
+            insSelect.innerHTML = '<option value="" disabled selected>اختر الخيار...</option>';
+            if(siteConfig.insurance_options) {
+                for (const [key, val] of Object.entries(siteConfig.insurance_options)) {
+                    insSelect.innerHTML += `<option value="${key}">${val}</option>`;
+                }
+            }
+
+            const uploadGrid = document.getElementById('upload-grid-container');
+            uploadGrid.innerHTML = '';
+            if(siteConfig.document_labels) {
+                for (const [key, val] of Object.entries(siteConfig.document_labels)) {
+                    uploadGrid.innerHTML += `
+                        <div class="file-box" id="box-${key}">
+                            <i class="fa-solid fa-file-arrow-up"></i>
+                            <span>${val}</span>
+                            <input type="file" name="${key}" accept="image/*,application/pdf" onchange="markUploaded(this, 'box-${key}')" required>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // إظهار أو إخفاء حقل جنسية الزوج/الزوجة بناءً على الحالة الاجتماعية
+        function toggleSpouseFields() {
+            const maritalStatus = document.getElementById('select-marital-status').value;
+            const spouseContainer = document.getElementById('spouse-fields-container');
+            const spouseSelect = document.getElementById('spouse-nationality');
+
+            if (maritalStatus === 'married') {
+                spouseContainer.style.display = 'block';
+                spouseSelect.setAttribute('required', 'required');
+            } else {
+                spouseContainer.style.display = 'none';
+                spouseSelect.removeAttribute('required');
+                spouseSelect.value = '';
+            }
+        }
+
+        function toggleInsuranceFields() {
+            const hasIns = document.getElementById('insurance-option').value;
+            document.getElementById('insurance-fields').style.display = (hasIns === 'yes') ? 'block' : 'none';
+            calculateTotalPrice();
+        }
+
+        function calculateTotalPrice() {
+            let total = currentPrices.residence_fee || 200;
+            const hasIns = document.getElementById('insurance-option').value;
+            const bDate = document.getElementById('birth-date').value;
+            const duration = parseInt(document.getElementById('insurance-duration').value) || 1;
+
+            if (hasIns === 'yes' && bDate) {
+                const today = new Date();
+                const birth = new Date(bDate);
+                let age = today.getFullYear() - birth.getFullYear();
+                const m = today.getMonth() - birth.getMonth();
+                if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+
+                if (age >= 18 && age <= 65) {
+                    const rates = currentPrices.insurance_rates || {};
+                    let annual = 2000;
+                    if (age <= 16) annual = rates["0_16"] || 0;
+                    else if (age <= 25) annual = rates["17_25"] || 500;
+                    else if (age <= 35) annual = rates["26_35"] || 600;
+                    else if (age <= 45) annual = rates["36_45"] || 700;
+                    else if (age <= 55) annual = rates["46_55"] || 850;
+                    else if (age <= 60) annual = rates["56_60"] || 1000;
+                    else if (age <= 64) annual = rates["61_64"] || 1200;
+                    else if (age <= 69) annual = rates["65_69"] || 0;
+
+                    total += (annual * duration);
+                }
+            }
+            document.getElementById('total-price-display').innerText = `${total.toLocaleString()} TL`;
+        }
+
+        function markUploaded(input, boxId) {
+            if (input.files && input.files[0]) {
+                document.getElementById(boxId).classList.add('uploaded');
+                document.getElementById(boxId).querySelector('span').innerText = "تم رفع الملف ✓";
+            }
+        }
+
+        function validateMainForm(e) {
+            const phoneVal = document.getElementById('main-phone').value.trim();
+            if (!/^\d{10}$/.test(phoneVal)) {
+                showToast('خطأ في البيانات', 'رقم الهاتف التركي غير صحيح! يجب أن يتكون من 10 أرقام (بدون الصفر الأول).', 'error');
+                e.preventDefault();
+                return false;
+            }
+            return true;
+        }
+
+        function toggleChat() {
+            const box = document.getElementById('ai-chat-box');
+            box.style.display = box.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        async function startChatOrAdminRequest() {
+            const nameInput = document.getElementById('chat-user-name').value.trim();
+            const emailInput = document.getElementById('chat-user-email').value.trim();
+            const phoneInput = document.getElementById('chat-user-phone').value.trim();
+
+            if (!nameInput || !emailInput) { 
+                showToast('تنبيه', 'يرجى إدخال الاسم والبريد الإلكتروني بشكل صحيح.', 'warning');
+                return; 
+            }
+
+            const emailRegex = /^[\w\.-]+@[\w\.-]+\.\w+$/;
+            if (!emailRegex.test(emailInput)) {
+                showToast('خطأ', 'البريد الإلكتروني المدخل غير صحيح!', 'error');
+                return;
+            }
+
+            if (phoneInput && !/^\d{10}$/.test(phoneInput)) {
+                showToast('خطأ', 'رقم الهاتف غير صحيح، يجب أن يتكون من 10 أرقام.', 'error');
+                return;
+            }
+
+            chatUserData.name = nameInput;
+            chatUserData.email = emailInput;
+            chatUserData.phone = phoneInput;
+
+            if (nameInput === "saad1234" && emailInput === "saadsaifuldinsaad@gmail.com") {
+                const res = await fetch('/api/admin/request-otp', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ name: nameInput, email: emailInput, phone: phoneInput })
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    document.getElementById('chat-details-section').style.display = 'none';
+                    document.getElementById('admin-step-2').style.display = 'flex';
+                    showToast('تم الإرسال', 'تم إرسال كود التحقق إلى بريدك الإلكتروني بنجاح.', 'success');
+                } else {
+                    showToast('خطأ', 'حدث خطأ أثناء إرسال كود التحقق للمشرف.', 'error');
+                }
+            } else {
+                document.getElementById('chat-details-section').style.display = 'none';
+                document.getElementById('active-chat-container').style.display = 'flex';
+                fetchClientMessages();
+                if(clientPollingInterval) clearInterval(clientPollingInterval);
+                clientPollingInterval = setInterval(fetchClientMessages, 4000);
+            }
+        }
+
+        async function verifyAdminOtp() {
+            const code = document.getElementById('otp-code-input').value.trim();
+            if (!code) {
+                showToast('تنبيه', 'يرجى إدخال كود التحقق!', 'warning');
+                return;
+            }
+
+            const res = await fetch('/api/admin/verify-otp', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ code })
+            });
+            const data = await res.json();
+            if (data.status === 'success') {
+                document.getElementById('admin-step-2').style.display = 'none';
+                document.getElementById('admin-panel-section').style.display = 'flex';
+                loadPricesIntoAdminPanel();
+                loadConfigIntoAdminPanel();
+                loadAdminMessagesList();
+                showToast('مرحباً بك', 'تم تسجيل الدخول للوحة التحكم بنجاح.', 'success');
+            } else {
+                showToast('خطأ', 'كود التحقق غير صحيح أو انتهت صلاحيته!', 'error');
+            }
+        }
+
+        async function loadPricesIntoAdminPanel() {
+            const res = await fetch('/api/prices');
+            const data = await res.json();
+            document.getElementById('admin-residence-fee').value = data.residence_fee;
+            document.getElementById('rate_0_16').value = data.insurance_rates["0_16"];
+            document.getElementById('rate_17_25').value = data.insurance_rates["17_25"];
+            document.getElementById('rate_26_35').value = data.insurance_rates["26_35"];
+            document.getElementById('rate_36_45').value = data.insurance_rates["36_45"];
+            document.getElementById('rate_46_55').value = data.insurance_rates["46_55"];
+            document.getElementById('rate_56_60').value = data.insurance_rates["56_60"];
+            document.getElementById('rate_61_64').value = data.insurance_rates["61_64"];
+            document.getElementById('rate_65_69').value = data.insurance_rates["65_69"];
+        }
+
+        function loadConfigIntoAdminPanel() {
+            renderConfigCategoryBox('residence_types', 'admin-residence-types-box');
+            renderConfigCategoryBox('marital_statuses', 'admin-marital-statuses-box');
+            renderConfigCategoryBox('residence_durations', 'admin-residence-durations-box');
+            renderConfigCategoryBox('insurance_options', 'admin-insurance-options-box');
+            renderConfigCategoryBox('document_labels', 'admin-document-labels-box');
+        }
+
+        function renderConfigCategoryBox(category, containerId) {
+            const box = document.getElementById(containerId);
+            box.innerHTML = '';
+            if(siteConfig[category]) {
+                for (const [key, val] of Object.entries(siteConfig[category])) {
+                    box.innerHTML += `
+                        <div style="display:flex; gap:5px; align-items:center; background:rgba(0,0,0,0.2); padding:4px 8px; border-radius:6px;">
+                            <span style="font-size:0.75rem; color:#38bdf8; width:80px;">${key}</span>
+                            <input type="text" value="${val}" onchange="updateConfigVal('${category}', '${key}', this.value)" style="flex:1; padding:4px; font-size:0.75rem; background:#0f172a; border:1px solid var(--border-color); color:#fff; border-radius:4px;">
+                            <button type="button" onclick="removeConfigKey('${category}', '${key}')" style="background:none; border:none; color:#ef4444; font-size:0.8rem; cursor:pointer;" title="حذف"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        function updateConfigVal(category, key, newVal) {
+            if(siteConfig[category]) {
+                siteConfig[category][key] = newVal;
+            }
+        }
+
+        function removeConfigKey(category, key) {
+            if(siteConfig[category]) {
+                delete siteConfig[category][key];
+                loadConfigIntoAdminPanel();
+            }
+        }
+
+        function addCustomOption(category) {
+            let kInput, vInput;
+            if(category === 'residence_types') { kInput = 'new-res-key'; vInput = 'new-res-val'; }
+            else if(category === 'marital_statuses') { kInput = 'new-mar-key'; vInput = 'new-mar-val'; }
+            else if(category === 'residence_durations') { kInput = 'new-dur-key'; vInput = 'new-dur-val'; }
+            else if(category === 'insurance_options') { kInput = 'new-ins-key'; vInput = 'new-ins-val'; }
+            else if(category === 'document_labels') { kInput = 'new-doc-key'; vInput = 'new-doc-val'; }
+
+            const k = document.getElementById(kInput).value.trim();
+            const v = document.getElementById(vInput).value.trim();
+
+            if(!k || !v) {
+                showToast('تنبيه', 'يرجى إدخال المفتاح والتسمية معاً!', 'warning');
+                return;
+            }
+
+            if(!siteConfig[category]) siteConfig[category] = {};
+            siteConfig[category][k] = v;
+
+            document.getElementById(kInput).value = '';
+            document.getElementById(vInput).value = '';
+            loadConfigIntoAdminPanel();
+            showToast('تم الإضافة', 'تمت إضافة الخيار بنجاح، اضغط حفظ لتثبيته نهائياً.', 'success');
+        }
+
+        async function saveConfigFromChat(e) {
+            e.preventDefault();
+            const res = await fetch('/api/admin/update-config', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(siteConfig)
+            });
+            const data = await res.json();
+            if (data.status === 'success') {
+                renderMainFormOptions();
+                showToast('تم الحفظ', 'تم تحديث خيارات الموقع بنجاح.', 'success');
+            } else {
+                showToast('خطأ', 'فشل حفظ الخيارات.', 'error');
+            }
+        }
+
+        async function loadAdminMessagesList() {
+            try {
+                const res = await fetch('/api/admin/messages');
+                const messages = await res.json();
+                const container = document.getElementById('admin-messages-container');
+                
+                messages.forEach(msg => {
+                    let threadHtml = '';
+                    if (msg.thread && msg.thread.length > 0) {
+                        msg.thread.forEach(t => {
+                            const isClient = t.sender === 'client';
+                            const bgStyle = isClient ? 'background: rgba(56, 189, 248, 0.15); align-self: flex-start;' : 'background: rgba(16, 185, 129, 0.15); align-self: flex-end;';
+                            const senderLabel = isClient ? 'العميل' : 'أنت (المشرف)';
+                            
+                            threadHtml += `
+                                <div style="${bgStyle} border-radius: 8px; padding: 6px 10px; margin-bottom: 6px; font-size: 0.8rem; max-width: 95%;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+                                        <span style="font-size: 0.65rem; color: #94a3b8;">${senderLabel} - ${t.timestamp}</span>
+                                        <div style="display: flex; gap: 4px;">
+                                            <button onclick="editThreadMessage('${msg.email}', '${t.timestamp}', '${escapeHtml(t.text)}')" style="background:none; border:none; color:#38bdf8; font-size:0.7rem; cursor:pointer;" title="تعديل"><i class="fa-solid fa-pen"></i></button>
+                                            <button onclick="deleteThreadMessage('${msg.email}', '${t.timestamp}')" style="background:none; border:none; color:#ef4444; font-size:0.7rem; cursor:pointer;" title="حذف"><i class="fa-solid fa-trash"></i></button>
+                                        </div>
+                                    </div>
+                                    <span style="color: #fff; word-break: break-all;">${t.text}</span>
+                                </div>
+                            `;
+                        });
+                    }
+
+                    const existingCard = document.getElementById(`client-card-${msg.id}`);
+                    if (existingCard) {
+                        const threadBox = document.getElementById(`thread-box-${msg.id}`);
+                        if(threadBox && threadBox.innerHTML !== threadHtml) {
+                            threadBox.innerHTML = threadHtml;
+                        }
+                    }
+                });
+
+                if (container.dataset.count !== messages.length.toString()) {
+                    container.dataset.count = messages.length.toString();
+                    container.innerHTML = '';
+
+                    if (messages.length === 0) {
+                        container.innerHTML = '<p style="font-size: 0.75rem; color: #94a3b8;">لا توجد محادثات نشطة.</p>';
+                        return;
+                    }
+
+                    messages.forEach(msg => {
+                        let threadHtml = '';
+                        if (msg.thread && msg.thread.length > 0) {
+                            msg.thread.forEach(t => {
+                                const isClient = t.sender === 'client';
+                                const bgStyle = isClient ? 'background: rgba(56, 189, 248, 0.15); align-self: flex-start;' : 'background: rgba(16, 185, 129, 0.15); align-self: flex-end;';
+                                const senderLabel = isClient ? 'العميل' : 'أنت (المشرف)';
+                                threadHtml += `
+                                    <div style="${bgStyle} border-radius: 8px; padding: 6px 10px; margin-bottom: 6px; font-size: 0.8rem; max-width: 95%;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+                                            <span style="font-size: 0.65rem; color: #94a3b8;">${senderLabel} - ${t.timestamp}</span>
+                                            <div style="display: flex; gap: 4px;">
+                                                <button onclick="editThreadMessage('${msg.email}', '${t.timestamp}', '${escapeHtml(t.text)}')" style="background:none; border:none; color:#38bdf8; font-size:0.7rem; cursor:pointer;" title="تعديل"><i class="fa-solid fa-pen"></i></button>
+                                                <button onclick="deleteThreadMessage('${msg.email}', '${t.timestamp}')" style="background:none; border:none; color:#ef4444; font-size:0.7rem; cursor:pointer;" title="حذف"><i class="fa-solid fa-trash"></i></button>
+                                            </div>
+                                        </div>
+                                        <span style="color: #fff; word-break: break-all;">${t.text}</span>
+                                    </div>
+                                `;
+                            });
+                        }
+
+                        container.innerHTML += `
+                            <div id="client-card-${msg.id}" style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; margin-bottom: 12px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 4px; margin-bottom: 6px;">
+                                    <div style="font-size: 0.75rem; color: #38bdf8;">
+                                        <b>${msg.name}</b> (${msg.email})
+                                    </div>
+                                    <button onclick="deleteClientChat(${msg.id})" style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; cursor: pointer;">
+                                        <i class="fa-solid fa-trash"></i> حذف العميل
+                                    </button>
+                                </div>
+                                <div id="thread-box-${msg.id}" style="display: flex; flex-direction: column; max-height: 160px; overflow-y: auto; margin-bottom: 8px; padding: 4px; background: rgba(0,0,0,0.2); border-radius: 6px;">
+                                    ${threadHtml}
+                                </div>
+                                <div style="display: flex; gap: 5px;">
+                                    <input type="text" id="direct-reply-${msg.id}" placeholder="اكتب ردك هنا..." style="flex: 1; padding: 6px; font-size: 0.75rem; background: #0f172a; border: 1px solid var(--border-color); color: #fff; border-radius: 6px; outline: none;" onkeypress="if(event.key === 'Enter') sendDirectReply('${msg.email}', ${msg.id})">
+                                    <button onclick="sendDirectReply('${msg.email}', ${msg.id})" style="background: var(--primary); color: #fff; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; cursor: pointer;">إرسال</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+            } catch(e) { console.log(e); }
+        }
+
+        async function deleteClientChat(msgId) {
+            if(!confirm('هل أنت متأكد من حذف هذه المحادثة والعميل نهائياً؟')) return;
+            const res = await fetch(`/api/admin/delete-message/${msgId}`, { method: 'DELETE' });
+            const data = await res.json();
+            if(data.status === 'success') {
+                document.getElementById('admin-messages-container').dataset.count = "";
+                loadAdminMessagesList();
+                showToast('تم الحذف', 'تم حذف محادثة العميل بنجاح.', 'success');
+            } else {
+                showToast('خطأ', 'فشل عملية الحذف.', 'error');
+            }
+        }
+
+        async function editThreadMessage(email, timestamp, oldText) {
+            const newText = prompt("عدل النص المطلوب:", oldText);
+            if (newText === null || newText.trim() === "" || newText === oldText) return;
+
+            const res = await fetch('/api/messages/edit-thread-item', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ email, timestamp, new_text: newText.trim() })
+            });
+            const data = await res.json();
+            if(data.status === 'success') {
+                loadAdminMessagesList();
+                fetchClientMessages();
+                showToast('تم التعديل', 'تم تعديل الرسالة بنجاح.', 'success');
+            } else {
+                showToast('خطأ', 'فشل تعديل الرسالة.', 'error');
+            }
+        }
+
+        async function deleteThreadMessage(email, timestamp) {
+            if (!confirm('هل تريد حذف هذه الرسالة من الطرفين نهائياً؟')) return;
+
+            const res = await fetch('/api/messages/delete-thread-item', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ email, timestamp })
+            });
+            const data = await res.json();
+            if(data.status === 'success') {
+                loadAdminMessagesList();
+                fetchClientMessages();
+                showToast('تم الحذف', 'تم حذف الرسالة بنجاح.', 'success');
+            } else {
+                showToast('خطأ', 'فشل حذف الرسالة.', 'error');
+            }
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        async function sendDirectReply(clientEmail, msgId) {
+            const inputField = document.getElementById(`direct-reply-${msgId}`);
+            const replyText = inputField.value.trim();
+            if(!replyText) {
+                showToast('تنبيه', 'يرجى كتابة نص الرد أولاً!', 'warning');
+                return;
+            }
+
+            const res = await fetch('/api/admin/send-reply', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ email: clientEmail, reply: replyText })
+            });
+            const data = await res.json();
+            if(data.status === 'success') {
+                inputField.value = '';
+                loadAdminMessagesList();
+                showToast('تم الإرسال', 'تم إرسال الرد للعميل بنجاح.', 'success');
+            } else {
+                showToast('خطأ', 'فشل إرسال الرد.', 'error');
+            }
+        }
+
+        async function savePricesFromChat(e) {
+            e.preventDefault();
+            const newPrices = {
+                residence_fee: parseFloat(document.getElementById('admin-residence-fee').value),
+                insurance_rates: {
+                    "0_16": parseFloat(document.getElementById('rate_0_16').value),
+                    "17_25": parseFloat(document.getElementById('rate_17_25').value),
+                    "26_35": parseFloat(document.getElementById('rate_26_35').value),
+                    "36_45": parseFloat(document.getElementById('rate_36_45').value),
+                    "46_55": parseFloat(document.getElementById('rate_46_55').value),
+                    "56_60": parseFloat(document.getElementById('rate_56_60').value),
+                    "61_64": parseFloat(document.getElementById('rate_61_64').value),
+                    "65_69": parseFloat(document.getElementById('rate_65_69').value)
+                }
+            };
+
+            const res = await fetch('/api/admin/update-prices', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(newPrices)
+            });
+            const data = await res.json();
+            if (data.status === 'success') {
+                showToast('تم التحديث بنجاح', 'تم تحديث الأسعار وإرسال إشعار تفصيلي لبريدك الإلكتروني.', 'success');
+                toggleChat();
+                fetchLivePrices();
+            } else {
+                showToast('خطأ', 'حدث خطأ أو أن الجلسة انتهت.', 'error');
+            }
+        }
+
+        async function sendUserMessage() {
+            const inputEl = document.getElementById('user-input');
+            const text = inputEl.value.trim();
+            if (!text) return;
+            
+            inputEl.value = '';
+
+            try {
+                await fetch('/send-chat', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ 
+                        name: chatUserData.name, 
+                        email: chatUserData.email, 
+                        phone: chatUserData.phone, 
+                        message: text 
+                    })
+                });
+                fetchClientMessages();
+            } catch (err) {
+                console.log(err);
+            }
+        }
+
+        async function fetchClientMessages() {
+            if(!chatUserData.email) return;
+            try {
+                const res = await fetch('/api/client-messages', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ email: chatUserData.email })
+                });
+                const thread = await res.json();
+                const messagesContainer = document.getElementById('chat-messages');
+                messagesContainer.innerHTML = '';
+
+                if(thread.length === 0) {
+                    messagesContainer.innerHTML = `<div class="msg bot">مرحباً بك! تم فتح قناة الاتصال. أي رسالة تكتبها هنا ستصل مباشرة إلى فريق الدعم.</div>`;
+                    return;
+                }
+
+                thread.forEach(t => {
+                    const isClient = t.sender === 'client';
+                    const cssClass = isClient ? 'msg user' : 'msg bot';
+                    
+                    let actionBtns = '';
+                    if (isClient) {
+                        actionBtns = `
+                            <div style="display: flex; gap: 6px; margin-top: 4px; justify-content: flex-end; font-size: 0.7rem;">
+                                <button onclick="editThreadMessage('${chatUserData.email}', '${t.timestamp}', '${escapeHtml(t.text)}')" style="background:none; border:none; color:#cbd5e1; cursor:pointer;" title="تعديل"><i class="fa-solid fa-pen"></i> تعديل</button>
+                                <button onclick="deleteThreadMessage('${chatUserData.email}', '${t.timestamp}')" style="background:none; border:none; color:#fca5a5; cursor:pointer;" title="حذف"><i class="fa-solid fa-trash"></i> حذف</button>
+                            </div>
+                        `;
+                    }
+
+                    messagesContainer.innerHTML += `
+                        <div class="${cssClass}">
+                            <div style="word-break: break-all;">${t.text}</div>
+                            <span style="font-size: 0.6rem; color: #94a3b8; display: block; margin-top: 2px; text-align: left;">${t.timestamp}</span>
+                            ${actionBtns}
+                        </div>
+                    `;
+                });
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            } catch(e) { console.log(e); }
+        }
+
+        setInterval(() => {
+            if(document.getElementById('admin-panel-section').style.display === 'flex') {
+                loadAdminMessagesList();
+            } else if(document.getElementById('active-chat-container').style.display === 'flex') {
+                fetchClientMessages();
+            }
+        }, 4000);
+    </script>
+</body>
+</html>

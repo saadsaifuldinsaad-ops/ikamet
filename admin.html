@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم المشرف الآمنة</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --border-color: #334155;
+            --accent: #10b981;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background: var(--bg); color: var(--text-main); padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .container { width: 100%; max-width: 500px; background: var(--card-bg); border-radius: 16px; padding: 25px; border: 1px solid var(--border-color); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h1 { font-size: 1.4rem; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; color: #38bdf8; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-size: 0.9rem; margin-bottom: 5px; color: #cbd5e1; }
+        input { width: 100%; padding: 10px 14px; background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-color); border-radius: 8px; color: #fff; font-size: 1rem; outline: none; }
+        input:focus { border-color: var(--primary); }
+        .btn { background: var(--accent); color: #fff; border: none; padding: 12px; width: 100%; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 15px; }
+        .note { background: rgba(56, 189, 248, 0.1); border-left: 4px solid #38bdf8; padding: 10px; font-size: 0.85rem; margin-bottom: 20px; color: #94a3b8; }
+        .step-section { display: none; }
+        .step-section.active { display: block; }
+    </style>
+</head>
+<body>
+
+    <div class="container step-section active" id="step-1">
+        <h1><i class="fa-solid fa-lock"></i> تحقق المشرف (الخطوة 1)</h1>
+        <div class="note">يرجى إدخال البريد الإلكتروني الرسمي لنظام الإدارة لاستلام رمز التحقق.</div>
+        <div class="form-group">
+            <label>الاسم الإداري</label>
+            <input type="text" id="admin-name" placeholder="أدخل الاسم...">
+        </div>
+        <div class="form-group">
+            <label>البريد الإلكتروني</label>
+            <input type="email" id="admin-email" placeholder="أدخل الإيميل الرسمي...">
+        </div>
+        <button class="btn" onclick="requestOtpCode()">إرسال رمز التحقق (OTP)</button>
+    </div>
+
+    <div class="container step-section" id="step-2">
+        <h1><i class="fa-solid fa-shield-halved"></i> أدخل كود التحقق (الخطوة 2)</h1>
+        <div class="note">تم إرسال رمز التحقق المكون من 6 أرقام إلى بريدك الإلكتروني.</div>
+        <div class="form-group">
+            <label>رمز التحقق (OTP)</label>
+            <input type="text" id="otp-code" placeholder="أدخل الأرقام الستة..." maxlength="6" style="letter-spacing: 5px; text-align: center; font-size: 1.2rem;">
+        </div>
+        <button class="btn" onclick="verifyOtpCode()">تأكيد ودخول لوحة التحكم</button>
+    </div>
+
+    <div class="container step-section" id="panel-section">
+        <h1><i class="fa-solid fa-sliders"></i> تعديل الأسعار والرسوم</h1>
+        <div class="note">مرحباً بك يا سعد، يمكنك تعديل الرسوم أدناه وسيتم إرسال إشعار فوري لبريدك عند الحفظ.</div>
+        
+        <form id="price-form" onsubmit="savePrices(event)">
+            <div class="form-group">
+                <label>رسوم موعد التقديم الثابتة (TL)</label>
+                <input type="number" id="residence_fee" required>
+            </div>
+            <h3 style="margin: 20px 0 10px 0; font-size: 1.1rem; color: #38bdf8;">أسعار التأمين السنوية حسب الفئات العمرية:</h3>
+            <div class="form-group"><label>فئة (0 إلى 16 سنة)</label><input type="number" id="rate_0_16" required></div>
+            <div class="form-group"><label>فئة (17 إلى 25 سنة)</label><input type="number" id="rate_17_25" required></div>
+            <div class="form-group"><label>فئة (26 إلى 35 سنة)</label><input type="number" id="rate_26_35" required></div>
+            <div class="form-group"><label>فئة (36 إلى 45 سنة)</label><input type="number" id="rate_36_45" required></div>
+            <div class="form-group"><label>فئة (46 إلى 55 سنة)</label><input type="number" id="rate_46_55" required></div>
+            <div class="form-group"><label>فئة (56 إلى 60 سنة)</label><input type="number" id="rate_56_60" required></div>
+            <div class="form-group"><label>فئة (61 إلى 64 سنة)</label><input type="number" id="rate_61_64" required></div>
+            <div class="form-group"><label>فئة (65 إلى 69 سنة)</label><input type="number" id="rate_65_69" required></div>
+            <button type="submit" class="btn">حفظ وتحديث الأسعار فوراً</button>
+        </form>
+    </div>
+
+    <script>
+        async function requestOtpCode() {
+            const name = document.getElementById('admin-name').value.trim();
+            const email = document.getElementById('admin-email').value.trim();
+
+            if(!name || !email) {
+                alert('يرجى إدخال الاسم والإيميل الإداري!');
+                return;
+            }
+
+            const res = await fetch('/api/admin/request-otp', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ name, email })
+            });
+            const data = await res.json();
+            if(data.status === 'success') {
+                document.getElementById('step-1').classList.remove('active');
+                document.getElementById('step-2').classList.add('active');
+            } else {
+                alert('بيانات الدخول غير صحيحة!');
+            }
+        }
+
+        async function verifyOtpCode() {
+            const code = document.getElementById('otp-code').value.trim();
+            if(!code) {
+                alert('يرجى إدخال كود التحقق!');
+                return;
+            }
+
+            const res = await fetch('/api/admin/verify-otp', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ code })
+            });
+            const data = await res.json();
+            if(data.status === 'success') {
+                document.getElementById('step-2').classList.remove('active');
+                document.getElementById('panel-section').classList.add('active');
+                loadCurrentPrices();
+            } else {
+                alert('كود التحقق غير صحيح أو انتهت صلاحيته!');
+            }
+        }
+
+        async function loadCurrentPrices() {
+            const res = await fetch('/api/prices');
+            const data = await res.json();
+            document.getElementById('residence_fee').value = data.residence_fee;
+            document.getElementById('rate_0_16').value = data.insurance_rates["0_16"];
+            document.getElementById('rate_17_25').value = data.insurance_rates["17_25"];
+            document.getElementById('rate_26_35').value = data.insurance_rates["26_35"];
+            document.getElementById('rate_36_45').value = data.insurance_rates["36_45"];
+            document.getElementById('rate_46_55').value = data.insurance_rates["46_55"];
+            document.getElementById('rate_56_60').value = data.insurance_rates["56_60"];
+            document.getElementById('rate_61_64').value = data.insurance_rates["61_64"];
+            document.getElementById('rate_65_69').value = data.insurance_rates["65_69"];
+        }
+
+        async function savePrices(e) {
+            e.preventDefault();
+            const newPrices = {
+                residence_fee: parseFloat(document.getElementById('residence_fee').value),
+                insurance_rates: {
+                    "0_16": parseFloat(document.getElementById('rate_0_16').value),
+                    "17_25": parseFloat(document.getElementById('rate_17_25').value),
+                    "26_35": parseFloat(document.getElementById('rate_26_35').value),
+                    "36_45": parseFloat(document.getElementById('rate_36_45').value),
+                    "46_55": parseFloat(document.getElementById('rate_46_55').value),
+                    "56_60": parseFloat(document.getElementById('rate_56_60').value),
+                    "61_64": parseFloat(document.getElementById('rate_61_64').value),
+                    "65_69": parseFloat(document.getElementById('rate_65_69').value)
+                }
+            };
+            const res = await fetch('/api/admin/update-prices', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(newPrices)
+            });
+            const data = await res.json();
+            if(data.status === 'success') { alert('تم تحديث الأسعار بنجاح وتم إرسال إشعار لبريدك!'); }
+            else { alert('حدث خطأ أو أن الجلسة انتهت.'); }
+        }
+    </script>
+</body>
+</html>

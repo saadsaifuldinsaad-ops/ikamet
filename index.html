@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول - النظام</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Tajawal', sans-serif; }
+        body { background: #0f172a; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; position: relative; }
+        .bg-animation { position: absolute; width: 100%; height: 100%; overflow: hidden; z-index: 1; }
+        .shape { position: absolute; filter: blur(80px); opacity: 0.5; animation: floatShape 10s infinite alternate; }
+        .shape:nth-child(1) { width: 350px; height: 350px; background: #4f46e5; top: -10%; right: -10%; border-radius: 50%; }
+        .shape:nth-child(2) { width: 400px; height: 400px; background: #06b6d4; bottom: -15%; left: -15%; border-radius: 50%; animation-delay: -5s; }
+        @keyframes floatShape { 0% { transform: translateY(0) scale(1); } 100% { transform: translateY(30px) scale(1.1); } }
+        .login-container { position: relative; z-index: 2; width: 100%; max-width: 420px; padding: 20px; }
+        .login-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); padding: 40px 30px; border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+        .login-header { text-align: center; margin-bottom: 25px; }
+        .icon-box { width: 65px; height: 65px; background: linear-gradient(135deg, #4f46e5, #06b6d4); border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 15px; color: #fff; font-size: 24px; box-shadow: 0 10px 20px rgba(79, 70, 229, 0.4); }
+        .login-header h2 { color: #f8fafc; font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+        .login-header p { color: #94a3b8; font-size: 14px; }
+        .google-btn { width: 100%; padding: 13px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; color: #f8fafc; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 12px; transition: all 0.3s ease; margin-bottom: 20px; text-decoration: none; }
+        .google-btn:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.3); transform: translateY(-2px); }
+        .google-btn img { width: 20px; height: 20px; }
+        .divider { display: flex; align-items: center; text-align: center; color: #64748b; font-size: 13px; margin-bottom: 20px; }
+        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .divider::before { margin-left: 10px; }
+        .divider::after { margin-right: 10px; }
+        .input-group { position: relative; margin-bottom: 20px; }
+        .input-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 16px; transition: 0.3s; }
+        .input-group input { width: 100%; padding: 14px 45px 14px 15px; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; color: #fff; font-size: 15px; outline: none; transition: all 0.3s ease; }
+        .input-group input:focus { border-color: #06b6d4; background: rgba(15, 23, 42, 0.9); box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.15); }
+        .input-group input:focus ~ .input-icon { color: #06b6d4; }
+        .submit-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #4f46e5, #06b6d4); border: none; border-radius: 12px; color: white; font-size: 16px; font-weight: 600; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px; transition: all 0.3s ease; box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3); }
+        .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 15px 25px rgba(79, 70, 229, 0.4); }
+        .error-msg { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #fca5a5; padding: 10px; border-radius: 8px; font-size: 13px; margin-bottom: 15px; text-align: center; display: none; }
+        .register-link { text-align: center; margin-top: 20px; font-size: 14px; color: #94a3b8; }
+        .register-link a { color: #06b6d4; text-decoration: none; font-weight: 600; }
+        .register-link a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="bg-animation">
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="icon-box">
+                    <i class="fa-solid fa-lock-open"></i>
+                </div>
+                <h2>أهلاً بك مجدداً</h2>
+                <p>يرجى تسجيل الدخول للمتابعة إلى النظام</p>
+            </div>
+
+            <div id="errorAlert" class="error-msg"></div>
+
+            <a href="/login/google" class="google-btn">
+                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google logo">
+                <span>المتابعة باستخدام Google</span>
+            </a>
+
+            <div class="divider">أو عبر البريد الإلكتروني</div>
+
+            <form id="loginForm" method="POST">
+                <div class="input-group">
+                    <span class="input-icon"><i class="fa-solid fa-envelope"></i></span>
+                    <input type="email" name="email" id="emailInput" placeholder="البريد الإلكتروني" required autocomplete="off">
+                </div>
+
+                <div class="input-group" id="passwordGroup">
+                    <span class="input-icon"><i class="fa-solid fa-key"></i></span>
+                    <input type="password" name="password" id="passwordInput" placeholder="كلمة المرور" required>
+                </div>
+
+                <div class="input-group" id="otpGroup" style="display: none;">
+                    <span class="input-icon"><i class="fa-solid fa-shield-halved"></i></span>
+                    <input type="text" name="otp_code" id="otpInput" placeholder="أدخل رمز التحقق (OTP) المرسل لإيميلك">
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    <span id="btnText">دخول النظام</span>
+                    <i class="fa-solid fa-arrow-left-long" id="btnIcon"></i>
+                </button>
+            </form>
+
+            <div class="register-link">
+                ليس لديك حساب؟ <a href="/register">عميل جديد؟ سجل الآن</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let step = 'login';
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const errorAlert = document.getElementById('errorAlert');
+            errorAlert.style.display = 'none';
+
+            const email = document.getElementById('emailInput').value;
+            const password = document.getElementById('passwordInput').value;
+            const otpCode = document.getElementById('otpInput').value;
+
+            let payload = { step: step, email: email };
+            if (step === 'login') {
+                payload.password = password;
+            } else {
+                payload.otp_code = otpCode;
+            }
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+
+                if (result.status === 'otp_sent') {
+                    step = 'verify';
+                    document.getElementById('passwordGroup').style.display = 'none';
+                    document.getElementById('otpGroup').style.display = 'block';
+                    document.getElementById('btnText').innerText = 'تحقق من الرمز والدخول';
+                    errorAlert.style.display = 'block';
+                    errorAlert.style.background = 'rgba(16, 185, 129, 0.2)';
+                    errorAlert.style.borderColor = '#10b981';
+                    errorAlert.style.color = '#6ee7b7';
+                    errorAlert.innerText = result.message;
+                } else if (result.status === 'success') {
+                    window.location.href = result.redirect;
+                } else {
+                    errorAlert.style.display = 'block';
+                    errorAlert.style.background = 'rgba(239, 68, 68, 0.2)';
+                    errorAlert.style.borderColor = '#ef4444';
+                    errorAlert.style.color = '#fca5a5';
+                    errorAlert.innerText = result.message || 'حدث خطأ ما';
+                }
+            } catch (err) {
+                errorAlert.style.display = 'block';
+                errorAlert.innerText = 'فشل الاتصال بالسيرفر';
+            }
+        });
+    </script>
+</body>
+</html>
